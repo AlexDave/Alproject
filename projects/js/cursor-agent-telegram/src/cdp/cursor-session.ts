@@ -1061,39 +1061,6 @@ async function clickPlanAnywhere(page: Page): Promise<boolean> {
   return false;
 }
 
-/** В некоторых версиях Cursor команды Plan Mode в палитре отсутствуют, поэтому не используем этот путь как основной. */
-const PLAN_MODE_PALETTE_QUERIES: string[] = [];
-
-async function runPaletteQuery(page: Page, query: string): Promise<boolean> {
-  try {
-    await page.keyboard.press('Escape').catch(() => {});
-    await page.waitForTimeout(100);
-    await page.keyboard.press('Control+Shift+P');
-    await page.waitForTimeout(300);
-    await page.keyboard.press('Control+A').catch(() => {});
-    await page.keyboard.type(query, { delay: 11 });
-    await page.waitForTimeout(350);
-    await page.keyboard.press('Enter');
-    await page.waitForTimeout(400);
-    await page.keyboard.press('Escape').catch(() => {});
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Command Palette: перебирает подмножество {@link PLAN_MODE_PALETTE_QUERIES} [from, to).
- */
-async function tryPlanCommandPalettesSlice(page: Page, from: number, to: number): Promise<boolean> {
-  const slice = PLAN_MODE_PALETTE_QUERIES.slice(from, to);
-  let anyOk = false;
-  for (const query of slice) {
-    if (await runPaletteQuery(page, query)) anyOk = true;
-  }
-  return anyOk;
-}
-
 /**
  * Без выпадающего меню режим у поля чата переключается Shift+Tab по кругу — несколько попыток клика по Plan.
  * @see activateComposerPlanMode
