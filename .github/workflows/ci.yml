@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      portal: ${{ steps.filter.outputs.portal }}
+      gateway: ${{ steps.filter.outputs.gateway }}
+      hello_lab: ${{ steps.filter.outputs.hello_lab }}
+      cursor_agent: ${{ steps.filter.outputs.cursor_agent }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            portal:
+              - 'apps/portal/**'
+              - 'packages/shared/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.github/workflows/ci.yml'
+            gateway:
+              - 'apps/agent-hub-gateway/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.github/workflows/ci.yml'
+            hello_lab:
+              - 'projects/js/hello-lab/**'
+            cursor_agent:
+              - 'projects/js/cursor-agent-telegram/**'
+
+  portal:
+    needs: detect
+    if: needs.detect.outputs.portal == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run test:ingest-contract
+      - run: npm run build:portal
+
+  gateway:
+    needs: detect
+    if: needs.detect.outputs.gateway == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run build:gateway
+
+  hello_lab:
+    needs: detect
+    if: needs.detect.outputs.hello_lab == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/js/hello-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: projects/js/hello-lab/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  cursor_agent:
+    needs: detect
+    if: needs.detect.outputs.cursor_agent == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/js/cursor-agent-telegram
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: projects/js/cursor-agent-telegram/package-lock.json
+      - run: npm ci
+      - run: npm run build

@@ -1,0 +1,41 @@
+{
+  "name": "alproject",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "node scripts/kill-dev-ports.mjs && node scripts/dev-all.mjs",
+    "dev:all": "node scripts/kill-dev-ports.mjs && node scripts/dev-all.mjs",
+    "dev:portal": "npm run dev -w @alproject/portal",
+    "dev:gateway": "npm run dev -w @alproject/agent-hub-gateway",
+    "dev:hello-lab": "npm run dev --prefix projects/js/hello-lab",
+    "dev:cursor-agent": "npm run dev --prefix projects/js/cursor-agent-telegram",
+    "dev:kill-ports": "node scripts/kill-dev-ports.mjs",
+    "build:portal": "npm run build -w @alproject/portal",
+    "build:gateway": "npm run build -w @alproject/agent-hub-gateway",
+    "build:hello-lab": "npm run build --prefix projects/js/hello-lab",
+    "build:cursor-agent": "npm run build --prefix projects/js/cursor-agent-telegram",
+    "build": "npm run build:portal && npm run build:gateway",
+    "build:all": "npm run build:portal && npm run build:gateway && npm run build:hello-lab && npm run build:cursor-agent",
+    "test:ingest-contract": "npm run test:ingest-contract -w @alproject/portal",
+    "tunnel:lt": "npx localtunnel@2.0.2 --port 3000",
+    "tunnel:ngrok": "ngrok http 3000",
+    "k8s:check-docker": "node scripts/check-docker.mjs",
+    "k8s:dev": "node scripts/check-docker.mjs && skaffold dev",
+    "k8s:dev:debug": "node scripts/check-docker.mjs && skaffold dev -v debug",
+    "k8s:run": "node scripts/check-docker.mjs && skaffold run",
+    "k8s:dev:portal": "node scripts/check-docker.mjs && skaffold dev -p portal",
+    "k8s:dev:gateway": "node scripts/check-docker.mjs && skaffold dev -p gateway",
+    "k8s:dev:hello-lab": "node scripts/check-docker.mjs && skaffold dev -p hello-lab",
+    "docker:recover": "powershell.exe -ExecutionPolicy Bypass -NoProfile -File scripts/docker-desktop-recover-windows.ps1",
+    "free-space": "powershell.exe -ExecutionPolicy Bypass -NoProfile -File scripts/free-space-quick.ps1",
+    "docker:compact-vhdx": "powershell.exe -ExecutionPolicy Bypass -NoProfile -File scripts/docker-vhdx-compact.ps1",
+    "docker:relocate-disk": "powershell.exe -ExecutionPolicy Bypass -NoProfile -File scripts/docker-relocate-disk.ps1"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "kill-port": "^2.0.1"
+  }
+}

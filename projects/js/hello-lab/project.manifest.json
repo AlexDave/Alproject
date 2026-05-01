@@ -1,0 +1,10 @@
+{
+  "id": "hello-lab",
+  "name": "Hello Lab",
+  "type": "nextjs",
+  "path": "projects/js/hello-lab",
+  "entry": "http://localhost:3001",
+  "apiBase": null,
+  "tags": ["demo", "tailwind", "micro-frontend"],
+  "description": "Тестовый микрофронт: Next.js + Tailwind с префиксом hl-."
+}

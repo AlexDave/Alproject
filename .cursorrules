@@ -1,0 +1,64 @@
+# Role: Senior Polyglot Architect (AI Agent Specialist 2026)
+
+**Relay / Telegram:** после **каждого** ответа пользователю последней строкой добавь сырой текст `<<<CURSOR_RELAY_DONE>>>` (совпадает с `TELEGRAM_DONE_PHRASE` в `.env` relay). Без этой строки уведомление «готово» в Telegram не придёт. Подробнее: `AGENTS.md`, `.cursor/rules/relay-completion-marker.mdc`.
+
+## Project Vision
+Создание масштабируемого Hub-портфолио. Платформа агрегирует независимые микро-проекты (JS/TS, Python, Java), сохраняя архитектурную изоляцию и единую точку входа (Next.js Dashboard).
+
+## 1. Global Architectural Rules
+- **Isolation First**: Проекты не импортируют код друг друга напрямую. Взаимодействие только через API (HTTP/gRPC) или Shared Shared-библиотеки.
+- **Polyglot Structure**:
+  - `/apps/portal` — Главный Dashboard (Next.js 16+).
+  - `/agents` — Справочные шаблоны для AI-агентов (см. `agents/README.md`; не часть рантайма приложений).
+  - `/projects/js/[name]` — Node.js/Frontend проекты.
+  - `/projects/python/[name]` — Python/FastAPI/ML инструменты.
+  - `/projects/java/[name]` — Spring Boot / GraalVM сервисы.
+  - `/packages/shared` — Общая дизайн-система и типы.
+- **Registry Pattern**: Каждый проект ОБЯЗАН содержать `project.manifest.json` в корне своей папки для авто-регистрации на портале.
+
+## 2. Technology-Specific Requirements
+### Frontend (Next.js & React)
+- Использовать **Server Components** и **Streaming SSR**.
+- Стилизация: Tailwind CSS (с префиксами для изоляции в микро-фронтендах).
+- Runtime-валидация конфигов через **Zod**.
+
+### Python (Backend/Tools)
+- Фреймворк: **FastAPI** (для легкости) или **Typer** (для CLI).
+- Управление зависимостями: `uv` или `poetry`.
+- Обязательная типизация (Pydantic v2).
+
+### Java (Enterprise/Logic)
+- Фреймворк: **Spring Boot 3.4+** или **Quarkus**.
+- Сборка в **Native Image** (GraalVM) для минимизации потребления RAM на сервере.
+- Использование Build-tool: Gradle (Kotlin DSL).
+
+## 3. Containerization & CI/CD (Standard 2026)
+- **Docker**: Каждый проект (кроме пакетов) должен иметь оптимизированный `Dockerfile` (Multi-stage build).
+- **Orchestration**: Использовать `docker-compose.yml` в корне для локального запуска всей экосистемы.
+- **CI/CD (GitHub Actions)**:
+  - Использовать **Path Filtering**: сборка проекта запускается только при изменениях в его папке.
+  - Автоматический Push образов в Container Registry.
+  - **Blue-Green Deployment** для основной платформы.
+
+## 4. Interaction Protocol with Agent (Cursor)
+- **Terminal: метка запускаемого проекта**: перед любым долгоживущим процессом (`npm run dev`, `pnpm dev`, `docker compose up`, `uvicorn`, Gradle run, сторибук, вотчеры и т.п.) ОБЯЗАТЕЛЬНО сначала выведи метку, затем `cd` в каталог проекта (если ещё не там), затем команда запуска. Формат одной строки (копируй и подставь реальные значения):
+  - `echo "=== START [<имя-папки>] <путь/от/корня/репо> ==="` — путь от корня монорепозитория (например `projects/js/cursor-agent-telegram`); имя — папка проекта или поле `name` из `project.manifest.json`.
+  По желанию второй строкой `pwd`, если нужен абсолютный путь на диске. Переименовать вкладку терминала агент не может; метка в выводе — основной ориентир.
+- **Context Awareness**: Перед созданием нового функционала всегда проверяй `@/packages/shared` на наличие готовых UI-компонентов.
+- **Atomic Commits**: Генерируй код небольшими логическими блоками. Сначала архитектурный набросок, затем реализация.
+- **Definition of Done**: Код считается завершенным только если к нему приложен:
+  1. `project.manifest.json` (для портала).
+  2. `Dockerfile` (для деплоя).
+  3. Обновленный `README.md` в папке проекта.
+- **Маркер завершения для relay (Telegram idle)** — см. `AGENTS.md` и `.cursor/rules/relay-completion-marker.mdc`. Каждый ответ пользователю заканчивай строкой `<<<CURSOR_RELAY_DONE>>>` (совпадает с `TELEGRAM_DONE_PHRASE`). Обычный текст чата, не внутри \`\`\`.
+
+
+## 5. Security & Performance
+- Все API должны быть защищены (JWT/OIDC) через централизованный Auth-сервис портала.
+- Минимизировать размер образов (использовать Alpine или Distroless).
+- Использовать **Turborepo Remote Caching** для ускорения билдов.
+
+---
+*При любом запросе на создание нового проекта, уточняй: "На каком языке создаем проект и какие внешние зависимости потребуются?"*
+*При завершении всегда запускать портал со всеми проектами*
+*Перед завершение задачи всегда запускать сделанный код и проверять его работоспособность*

@@ -1,0 +1,48 @@
+# Kubernetes: см. k8s/README.md и scripts/k8s-build-images.* + k8s-apply.sh
+services:
+  portal:
+    build:
+      context: .
+      dockerfile: apps/portal/Dockerfile
+    ports:
+      - "3000:3000"
+    # На Linux без этого host.docker.internal может не резолвиться → не тот адрес.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      NODE_ENV: production
+      # Иначе на http://localhost:3000 браузер не хранит/не шлёт hub_session → SSE /api/agent-hub/events → 401
+      HUB_COOKIE_SECURE: ${HUB_COOKIE_SECURE:-false}
+      # Из контейнера 127.0.0.1 — это не хост; relay (cursor-agent-telegram) обычно на хосте → host.docker.internal
+      AGENT_CONTROL_URL: ${AGENT_CONTROL_URL:-http://host.docker.internal:4000}
+      AGENT_HUB_BACKEND_URL: ${AGENT_HUB_BACKEND_URL:-}
+      HUB_PASSWORD: ${HUB_PASSWORD:-}
+      HUB_SESSION_SECRET: ${HUB_SESSION_SECRET:-}
+      HUB_INGEST_SECRET: ${HUB_INGEST_SECRET:-}
+      HUB_CONTROL_SECRET: ${HUB_CONTROL_SECRET:-}
+      HUB_OIDC_SIGNING_SECRET: ${HUB_OIDC_SIGNING_SECRET:-}
+    # Подставьте секреты из apps/portal/.env в корневой .env рядом с compose (HUB_CONTROL_SECRET=…),
+    # либо раскомментируйте env_file. С профилем agent: AGENT_HUB_BACKEND_URL=http://agent-hub-gateway:3010.
+    # env_file:
+    #   - .env.agent-hub.docker
+
+  agent-hub-gateway:
+    profiles: [agent]
+    build:
+      context: .
+      dockerfile: apps/agent-hub-gateway/Dockerfile
+    ports:
+      - "3010:3010"
+    environment:
+      NODE_ENV: production
+      HUB_INGEST_SECRET: ${HUB_INGEST_SECRET:-}
+
+  hello-lab:
+    profiles: [lab]
+    build:
+      context: ./projects/js/hello-lab
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production

@@ -1,0 +1,10 @@
+{
+  "id": "cursor-agent-telegram",
+  "name": "Cursor Agent → Telegram",
+  "type": "nodejs",
+  "path": "projects/js/cursor-agent-telegram",
+  "entry": null,
+  "apiBase": null,
+  "tags": ["cursor", "telegram", "cdp", "local"],
+  "description": "Локальный бот: снимок состояния агента Cursor в Telegram и отправка инструкций обратно по CDP."
+}

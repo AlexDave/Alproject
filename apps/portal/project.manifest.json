@@ -1,0 +1,10 @@
+{
+  "id": "portal",
+  "name": "Hub Portal",
+  "type": "nextjs",
+  "path": "apps/portal",
+  "entry": "/",
+  "apiBase": null,
+  "tags": ["dashboard", "hub"],
+  "description": "Главный Dashboard и точка входа портфолио."
+}

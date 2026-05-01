@@ -1,0 +1,26 @@
+{
+  "name": "@alproject/portal",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test:ingest-contract": "npx --yes tsx scripts/ingest-contract-smoke.ts",
+    "test:hub-auth": "npx --yes tsx --test tests/hub-auth.test.ts tests/miniapp-session.test.ts"
+  },
+  "dependencies": {
+    "@alproject/shared": "*",
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.6.0"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "killPortsBeforeDev": [3000, 3001, 3010, 4000],
+  "services": [
+    {
+      "name": "portal",
+      "npmScript": "dev:portal",
+      "profiles": ["default", "full", "agent"],
+      "urls": ["http://localhost:3000"]
+    },
+    {
+      "name": "agent-hub-gateway",
+      "npmScript": "dev:gateway",
+      "profiles": ["agent"],
+      "urls": ["http://localhost:3010"]
+    },
+    {
+      "name": "hello-lab",
+      "npmScript": "dev:hello-lab",
+      "profiles": ["full"],
+      "urls": ["http://localhost:3001"]
+    },
+    {
+      "name": "cursor-agent-relay",
+      "npmScript": "dev:cursor-agent",
+      "profiles": ["default", "full"],
+      "urls": ["tsx → CDP + Hub ingest", "POST http://127.0.0.1:4000/control"]
+    }
+  ]
+}

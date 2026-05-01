@@ -1,0 +1,63 @@
+# См. https://skaffold.dev/docs/references/yaml/
+# Цикл разработки: skaffold dev (пересборка образов и деплой при изменении файлов в контекстах сборки).
+# Docker Desktop должен быть запущен (иначе pipe dockerDesktopLinuxEngine недоступен).
+# Отладочный лог: skaffold dev -v debug  (не используйте «-debug» — ломает разбор флагов и теги образов).
+.dockerDefaults: &dockerDefaults
+  local:
+    push: false
+    useDockerCLI: true
+  platforms:
+    - linux/amd64
+
+apiVersion: skaffold/v4beta13
+kind: Config
+metadata:
+  name: alproject
+build:
+  <<: *dockerDefaults
+  artifacts:
+    - image: alproject-portal
+      context: .
+      docker:
+        dockerfile: apps/portal/Dockerfile
+    - image: alproject-agent-hub-gateway
+      context: .
+      docker:
+        dockerfile: apps/agent-hub-gateway/Dockerfile
+    - image: alproject-hello-lab
+      context: projects/js/hello-lab
+      docker:
+        dockerfile: Dockerfile
+manifests:
+  kustomize:
+    paths:
+      - k8s
+deploy:
+  kubectl: {}
+
+profiles:
+  # Только портал — быстрее итерации при правках apps/portal и packages/shared.
+  - name: portal
+    build:
+      <<: *dockerDefaults
+      artifacts:
+        - image: alproject-portal
+          context: .
+          docker:
+            dockerfile: apps/portal/Dockerfile
+  - name: gateway
+    build:
+      <<: *dockerDefaults
+      artifacts:
+        - image: alproject-agent-hub-gateway
+          context: .
+          docker:
+            dockerfile: apps/agent-hub-gateway/Dockerfile
+  - name: hello-lab
+    build:
+      <<: *dockerDefaults
+      artifacts:
+        - image: alproject-hello-lab
+          context: projects/js/hello-lab
+          docker:
+            dockerfile: Dockerfile
